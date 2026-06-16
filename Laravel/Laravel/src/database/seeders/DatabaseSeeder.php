@@ -17,11 +17,19 @@ final class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // ============ SEED USER ============
+        // Hapus user admin lama jika ada
+        User::where('email', 'admin@admin.com')->delete();
 
-        User::factory()->create([
+        // Buat user admin dengan password admin123
+        User::create([
             'name' => 'Admin',
             'email' => 'admin@admin.com',
+            'password' => 'admin123',
+            'email_verified_at' => now(),
         ]);
+
+        // ============ SEED KOST ============
+        $this->call(KostSeeder::class);
     }
 }
