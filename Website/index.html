@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IndeKos - Kost Nyaman Modern</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ==================== NAVBAR ==================== -->
+  <!-- Navbar dengan dropdown untuk About (System & Kamar) -->
+  <nav class="navbar">
+    <div class="nav-brand">IndeKos</div>
+    <ul class="nav-links">
+      <li><a href="#home" class="nav-link active" data-section="home">Home</a></li>
+      
+      <!-- Dropdown About di navbar -->
+      <li class="dropdown">
+        <a href="#about-section" class="nav-link dropdown-toggle" data-section="about">About ▼</a>
+        <ul class="dropdown-menu">
+          <li><a href="#system-section" class="dropdown-item">⚙️ System</a></li>
+          <li><a href="#kamar-section" class="dropdown-item">🛏️ Kamar</a></li>
+        </ul>
+      </li>
+      
+      <li><a href="#login" class="nav-link" data-section="login">Login</a></li>
+    </ul>
+  </nav>
+
+  <!-- ==================== MAIN CONTENT (SCROLL SATU HALAMAN) ==================== -->
+  <main>
+    <!-- ==================== HOME SECTION ==================== -->
+    <section id="home" class="scroll-section">
+      <div class="hero-tagline">
+        <p class="tagline-sub">SELAMAT DATANG DI</p>
+        <h1 class="tagline-main">IndeKos</h1>
+        <!-- Tagline kedua: ukuran font diperbesar (1.4rem) -->
+        <p class="tagline-sub-secondary">Menjadikan kost sebagai<br>rumah kedua yang nyaman dan siap untuk dihuni</p>
+      </div>
+
+      <div class="home-dashboard">
+        <!-- Ketersediaan Kamar -->
+        <div class="dashboard-card availability-card">
+          <div class="card-eyebrow">Ketersediaan Kamar</div>
+          <h3 class="card-title">Status Real-Time</h3>
+          <div class="room-list">
+            <div class="room-item">
+              <div class="room-info">
+                <span class="room-label">Kamar A</span>
+                <span class="room-class">VIP</span>
+              </div>
+              <div class="room-status available">
+                <span class="status-dot"></span>
+                <span class="status-count">10 tersedia</span>
+              </div>
+            </div>
+            <div class="room-item">
+              <div class="room-info">
+                <span class="room-label">Kamar B</span>
+                <span class="room-class">Deluxe</span>
+              </div>
+              <div class="room-status full">
+                <span class="status-dot"></span>
+                <span class="status-count">Penuh</span>
+              </div>
+            </div>
+            <div class="room-item">
+              <div class="room-info">
+                <span class="room-label">Kamar C</span>
+                <span class="room-class">Regular</span>
+              </div>
+              <div class="room-status available">
+                <span class="status-dot"></span>
+                <span class="status-count">14 tersedia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistik -->
+        <div class="dashboard-card stats-card">
+          <div class="card-eyebrow">Statistik Hunian</div>
+          <h3 class="card-title">Dipercaya Banyak Penyewa</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-number">72</div>
+              <div class="stat-label">Unit Kamar</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-number">4.5<span class="stat-suffix">/5</span></div>
+              <div class="stat-label">Rating Kepuasan</div>
+              <div class="stars">★★★★<span class="star-half">★</span></div>
+            </div>
+          </div>
+          <a href="#about-section" class="cta-btn" id="cta-about">Lihat Kamar &rarr;</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ABOUT SECTION ==================== -->
+    <!-- Semua konten System dan Kamar ditampilkan seluruhnya, tanpa dropdown internal -->
+    <section id="about-section" class="scroll-section">
+      <div class="about-header">
+        <h2 class="section-title">Tentang <span class="accent">IndeKos</span></h2>
+        <!-- Keterangan kecil (opsional) -->
+        <p class="view-desc" style="margin-bottom: 20px;">Ekosistem digital & pilihan kamar terbaik untuk kenyamanan Anda.</p>
+      </div>
+
+      <!-- ===== BAGIAN SYSTEM ===== -->
+      <div id="system-section" class="about-subsection">
+        <h3 class="subsection-title">⚙️ System Digital</h3>
+        <p class="subsection-desc">Fitur canggih untuk kemudahan pengelolaan kost.</p>
+        <div class="features-grid" id="featuresGrid">
+          <div class="feature-card" data-feature="akses">
+            <div class="feature-icon">🔐</div>
+            <h4 class="feature-title">Akses Pintu Digital</h4>
+          </div>
+          <div class="feature-card" data-feature="tagihan">
+            <div class="feature-icon">💳</div>
+            <h4 class="feature-title">Tagihan Otomatis</h4>
+          </div>
+          <div class="feature-card" data-feature="keluhan">
+            <div class="feature-icon">📋</div>
+            <h4 class="feature-title">Laporan Keluhan</h4>
+          </div>
+          <div class="feature-card" data-feature="manajemen">
+            <div class="feature-icon">🏠</div>
+            <h4 class="feature-title">Manajemen Kamar</h4>
+          </div>
+          <div class="feature-card" data-feature="ortu">
+            <div class="feature-icon">👁️</div>
+            <h4 class="feature-title">Monitoring Orang Tua</h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== BAGIAN KAMAR ===== -->
+      <div id="kamar-section" class="about-subsection">
+        <h3 class="subsection-title">🛏️ Tipe Kamar</h3>
+        <p class="subsection-desc">Pilih sesuai kebutuhan dan budget Anda.</p>
+        <div class="rooms-grid">
+          <div class="room-card vip">
+            <div class="floor-badge">Lantai 1</div>
+            <div class="room-card-header">
+              <span class="room-tier">VIP Class</span>
+              <h3 class="room-name">Kamar A</h3>
+            </div>
+            <div class="room-size">5 × 6 m²</div>
+            <ul class="room-facilities">
+              <li>🚿 Kamar mandi dalam</li>
+              <li>❄️ AC</li>
+              <li>🛏️ Kasur</li>
+              <li>🪞 Lemari</li>
+              <li>📺 TV</li>
+            </ul>
+            <div class="room-card-footer">
+              <div class="room-availability available-tag">10 unit tersedia</div>
+              <div class="room-price">Rp 2.500.000<span>/bulan</span></div>
+            </div>
+          </div>
+
+          <div class="room-card deluxe">
+            <div class="floor-badge">Lantai 2</div>
+            <div class="room-card-header">
+              <span class="room-tier">Deluxe Class</span>
+              <h3 class="room-name">Kamar B</h3>
+            </div>
+            <div class="room-size">4 × 5 m²</div>
+            <ul class="room-facilities">
+              <li>🚿 Kamar mandi dalam</li>
+              <li>🛏️ Kasur</li>
+              <li>❄️ AC</li>
+            </ul>
+            <div class="room-card-footer">
+              <div class="room-availability full-tag">Penuh</div>
+              <div class="room-price">Rp 1.800.000<span>/bulan</span></div>
+            </div>
+          </div>
+
+          <div class="room-card regular">
+            <div class="floor-badge">Lantai 3</div>
+            <div class="room-card-header">
+              <span class="room-tier">Regular Class</span>
+              <h3 class="room-name">Kamar C</h3>
+            </div>
+            <div class="room-size">3 × 4 m²</div>
+            <ul class="room-facilities">
+              <li>🛏️ Kasur</li>
+              <li>🌀 Kipas angin</li>
+              <li>🚿 Kamar mandi luar</li>
+            </ul>
+            <div class="room-card-footer">
+              <div class="room-availability available-tag">14 unit tersedia</div>
+              <div class="room-price">Rp 800.000<span>/bulan</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LOGIN SECTION ==================== -->
+    <section id="login" class="scroll-section">
+      <div class="login-placeholder">
+        <div class="lock-icon">🔒</div>
+        <h2 class="section-title">Halaman Login</h2>
+        <p class="login-note">Fitur login sedang dalam pengembangan.<br>Segera hadir!</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer">
+    <div class="footer-brand">IndeKos</div>
+    <p class="footer-copy">© 2025 IndeKos. Hak cipta dilindungi.</p>
+  </footer>
+
+  <!-- Modal Popup untuk detail fitur System -->
+  <div id="featureModal" class="feature-modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <div class="modal-icon"></div>
+      <h3 class="modal-title"></h3>
+      <p class="modal-desc"></p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
