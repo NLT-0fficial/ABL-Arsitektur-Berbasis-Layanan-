@@ -1,21 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\Kost;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
-class KostSeeder extends Seeder
+final class KostSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Data nama penyewa laki-laki semua
         $dataPenyewa = [
-            // Lantai A (Lantai 1) - 10 kamar terisi semua
             'A101' => 'Budi Santoso',
             'A102' => 'Ahmad Fauzi',
             'A103' => 'Rudi Hartono',
@@ -26,16 +23,13 @@ class KostSeeder extends Seeder
             'A108' => 'Rizky Febrian',
             'A109' => 'Eko Prasetyo',
             'A110' => 'Dedi Irawan',
-            
-            // Lantai B (Lantai 2) - 5 kamar terisi
+
             'B101' => 'Irfan Hakim',
             'B102' => 'Yudi Setiawan',
             'B103' => 'Fajar Ramadhan',
             'B104' => 'Gilang Pratama',
             'B105' => 'Rizal Maulana',
-            // B106 - B110 kosong
-            
-            // Lantai C (Lantai 3) - 8 kamar terisi
+
             'C101' => 'Surya Wijaya',
             'C102' => 'Bayu Saputra',
             'C103' => 'Darma Putra',
@@ -43,28 +37,40 @@ class KostSeeder extends Seeder
             'C105' => 'Joko Widodo',
             'C106' => 'Kartono Susanto',
             'C107' => 'Mulyono Hadi',
-            'C108' => 'Rahmat Hidayat'
-            // C109 - C110 kosong
+            'C108' => 'Rahmat Hidayat',
         ];
 
-        // Data tambahan untuk lantai yang kosong
         $lantai = ['A', 'B', 'C'];
-        
-        // Hapus data lama
-        Kost::truncate();
-        
-        // Buat data baru
+
+        Kost::query()->delete();
+
+        // Hapus user kamar lama (selain admin)
+        User::where('email', 'like', '%@gmail.com')->delete();
+
         foreach ($lantai as $l) {
             for ($i = 101; $i <= 110; $i++) {
-                $kamar = $l . $i;
-                $isTerisi = isset($dataPenyewa[$kamar]);
-                
+                $kamar      = $l . $i;
+                $isTerisi   = isset($dataPenyewa[$kamar]);
+                $namaPenyewa = $isTerisi ? $dataPenyewa[$kamar] : null;
+
                 Kost::create([
-                    'lantai' => $l,
-                    'nomor_kamar' => $kamar,
-                    'nama_penyewa' => $isTerisi ? $dataPenyewa[$kamar] : null,
-                    'status' => $isTerisi ? 'terisi' : 'kosong'
+                    'lantai'       => $l,
+                    'nomor_kamar'  => $kamar,
+                    'nama_penyewa' => $namaPenyewa,
+                    'status'       => $isTerisi ? 'terisi' : 'kosong',
                 ]);
+
+                if ($isTerisi && $namaPenyewa) {
+                    $namaAwal   = strtolower(explode(' ', $namaPenyewa)[0]);
+                    $angkaKamar = $i; // 101, 102, dst
+
+                    User::create([
+                        'name'              => $namaPenyewa,
+                        'email'             => strtolower($kamar) . '@gmail.com',
+                        'password'          => $namaAwal . $angkaKamar,
+                        'email_verified_at' => now(),
+                    ]);
+                }
             }
         }
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Admin\Resources\Kosts;
 
 use App\Filament\Admin\Resources\Kosts\Pages\CreateKost;
@@ -16,7 +18,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class KostResource extends Resource
+final class KostResource extends Resource
 {
     protected static ?string $model = Kost::class;
 

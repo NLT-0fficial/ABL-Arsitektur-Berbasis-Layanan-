@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Admin\Resources\Kosts\Pages;
 
 use App\Filament\Admin\Resources\Kosts\KostResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewKost extends ViewRecord
+final class ViewKost extends ViewRecord
 {
     protected static string $resource = KostResource::class;
 

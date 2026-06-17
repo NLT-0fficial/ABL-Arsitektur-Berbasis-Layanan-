@@ -1,17 +1,15 @@
 <?php
 
-declare(strict_types=1);
+namespace App\Filament\Admin\Resources\KostLogs\Pages;
 
-namespace App\Filament\Admin\Resources\Kosts\Pages;
-
-use App\Filament\Admin\Resources\Kosts\KostResource;
+use App\Filament\Admin\Resources\KostLogs\KostLogResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditKost extends EditRecord
+class EditKostLog extends EditRecord
 {
-    protected static string $resource = KostResource::class;
+    protected static string $resource = KostLogResource::class;
 
     protected function getHeaderActions(): array
     {

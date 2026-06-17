@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 
-class Kost extends Model
+final class Kost extends Model
 {
     use HasFactory;
 
@@ -26,7 +28,7 @@ class Kost extends Model
         'lantai',
         'nomor_kamar',
         'nama_penyewa',
-        'status'
+        'status',
     ];
 
     /**
@@ -47,17 +49,66 @@ class Kost extends Model
      */
     protected $appends = [
         'nama_kamar_lengkap',
-        'status_text'
+        'status_text',
     ];
 
+    /**
+     * Get all penyewa names.
+     */
+    public static function getAllPenyewa(): array
+    {
+        return self::terisi()->pluck('nama_penyewa')->toArray();
+    }
+
+    /**
+     * Get statistic per lantai.
+     */
+    public static function getStatistik(): array
+    {
+        $lantai = ['A', 'B', 'C'];
+        $statistik = [];
+
+        foreach ($lantai as $l) {
+            $total = self::byLantai($l)->count();
+            $terisi = self::byLantai($l)->terisi()->count();
+            $kosong = self::byLantai($l)->kosong()->count();
+
+            $statistik[$l] = [
+                'total' => $total,
+                'terisi' => $terisi,
+                'kosong' => $kosong,
+                'persentase_terisi' => $total > 0 ? round(($terisi / $total) * 100, 2) : 0,
+            ];
+        }
+
+        return $statistik;
+    }
+
+    /**
+     * Get total statistic.
+     */
+    public static function getTotalStatistik(): array
+    {
+        $total = self::count();
+        $terisi = self::terisi()->count();
+        $kosong = self::kosong()->count();
+
+        return [
+            'total_kamar' => $total,
+            'total_terisi' => $terisi,
+            'total_kosong' => $kosong,
+            'persentase_terisi' => $total > 0 ? round(($terisi / $total) * 100, 2) : 0,
+        ];
+    }
+
     // ============ SCOPES ============
-    
+
     /**
      * Scope a query to only include kost by lantai.
      */
     public function scopeByLantai(Builder $query, string $lantai): Builder
     {
-        return $query->where('lantai', strtoupper($lantai));
+        return $query->where('lantai', mb_strtoupper($lantai));
     }
 
     /**
@@ -85,13 +136,13 @@ class Kost extends Model
     }
 
     // ============ ACCESSORS ============
-    
+
     /**
      * Get the nama kamar lengkap attribute.
      */
     public function getNamaKamarLengkapAttribute(): string
     {
-        return $this->lantai . $this->nomor_kamar;
+        return $this->lantai.$this->nomor_kamar;
     }
 
     /**
@@ -112,18 +163,18 @@ class Kost extends Model
             'B' => 'Lantai 2',
             'C' => 'Lantai 3',
         ];
-        
+
         return $map[$this->lantai] ?? $this->lantai;
     }
 
     // ============ MUTATORS ============
-    
+
     /**
      * Set the lantai attribute.
      */
     public function setLantaiAttribute(string $value): void
     {
-        $this->attributes['lantai'] = strtoupper($value);
+        $this->attributes['lantai'] = mb_strtoupper($value);
     }
 
     /**
@@ -131,11 +182,11 @@ class Kost extends Model
      */
     public function setNomorKamarAttribute(string $value): void
     {
-        $this->attributes['nomor_kamar'] = strtoupper($value);
+        $this->attributes['nomor_kamar'] = mb_strtoupper($value);
     }
 
     // ============ HELPER METHODS ============
-    
+
     /**
      * Check if kamar is terisi.
      */
@@ -150,54 +201,5 @@ class Kost extends Model
     public function isKosong(): bool
     {
         return $this->status === 'kosong';
-    }
-
-    /**
-     * Get all penyewa names.
-     */
-    public static function getAllPenyewa(): array
-    {
-        return self::terisi()->pluck('nama_penyewa')->toArray();
-    }
-
-    /**
-     * Get statistic per lantai.
-     */
-    public static function getStatistik(): array
-    {
-        $lantai = ['A', 'B', 'C'];
-        $statistik = [];
-        
-        foreach ($lantai as $l) {
-            $total = self::byLantai($l)->count();
-            $terisi = self::byLantai($l)->terisi()->count();
-            $kosong = self::byLantai($l)->kosong()->count();
-            
-            $statistik[$l] = [
-                'total' => $total,
-                'terisi' => $terisi,
-                'kosong' => $kosong,
-                'persentase_terisi' => $total > 0 ? round(($terisi / $total) * 100, 2) : 0,
-            ];
-        }
-        
-        return $statistik;
-    }
-
-    /**
-     * Get total statistic.
-     */
-    public static function getTotalStatistik(): array
-    {
-        $total = self::count();
-        $terisi = self::terisi()->count();
-        $kosong = self::kosong()->count();
-        
-        return [
-            'total_kamar' => $total,
-            'total_terisi' => $terisi,
-            'total_kosong' => $kosong,
-            'persentase_terisi' => $total > 0 ? round(($terisi / $total) * 100, 2) : 0,
-        ];
     }
 }
