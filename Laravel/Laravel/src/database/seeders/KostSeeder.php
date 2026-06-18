@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Kost;
+use App\Models\KostQrToken;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role; // <-- TAMBAHKAN INI
 
 final class KostSeeder extends Seeder
 {
@@ -42,36 +44,55 @@ final class KostSeeder extends Seeder
 
         $lantai = ['A', 'B', 'C'];
 
-        Kost::query()->delete();
+        // Buat role penyewa jika belum ada
+        Role::firstOrCreate(['name' => 'penyewa']); // <-- TAMBAHKAN INI
 
-        // Hapus user kamar lama (selain admin)
+        // Hapus data lama
+        Kost::query()->delete();
+        KostQrToken::query()->delete();
+        
+        // Hapus user penyewa lama (selain admin)
         User::where('email', 'like', '%@gmail.com')->delete();
 
         foreach ($lantai as $l) {
             for ($i = 101; $i <= 110; $i++) {
-                $kamar      = $l . $i;
-                $isTerisi   = isset($dataPenyewa[$kamar]);
+                $kamar       = $l . $i;
+                $isTerisi    = isset($dataPenyewa[$kamar]);
                 $namaPenyewa = $isTerisi ? $dataPenyewa[$kamar] : null;
+                $userId      = null;
 
+                // Buat user kalau kamar terisi
+                if ($isTerisi && $namaPenyewa) {
+                    $namaAwal   = strtolower(explode(' ', $namaPenyewa)[0]);
+                    $angkaKamar = $i;
+
+                    $user = User::create([
+                        'name'              => $namaPenyewa,
+                        'email'             => strtolower($kamar) . '@gmail.com',
+                        'password'          => bcrypt($namaAwal . $angkaKamar),
+                        'email_verified_at' => now(),
+                    ]);
+
+                    // Assign role penyewa ke user
+                    $user->assignRole('penyewa'); // <-- TAMBAHKAN INI
+
+                    $userId = $user->id;
+                }
+
+                // Buat data kost
                 Kost::create([
+                    'user_id'      => $userId,
                     'lantai'       => $l,
                     'nomor_kamar'  => $kamar,
                     'nama_penyewa' => $namaPenyewa,
                     'status'       => $isTerisi ? 'terisi' : 'kosong',
                 ]);
-
-                if ($isTerisi && $namaPenyewa) {
-                    $namaAwal   = strtolower(explode(' ', $namaPenyewa)[0]);
-                    $angkaKamar = $i; // 101, 102, dst
-
-                    User::create([
-                        'name'              => $namaPenyewa,
-                        'email'             => strtolower($kamar) . '@gmail.com',
-                        'password'          => $namaAwal . $angkaKamar,
-                        'email_verified_at' => now(),
-                    ]);
-                }
             }
         }
+
+        // Generate token permanen untuk setiap kamar terisi
+        Kost::terisi()->each(function (Kost $kost) {
+            KostQrToken::getOrCreateFor($kost->id);
+        });
     }
 }

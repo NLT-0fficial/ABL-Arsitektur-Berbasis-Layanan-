@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 
 class ScanController extends Controller
 {
-    /**
-     * Tampilkan halaman scanner webcam (di PC).
-     */
     public function index()
     {
         $logsHariIni = KostLog::with('kost')
@@ -22,9 +19,6 @@ class ScanController extends Controller
         return view('scan.index', compact('logsHariIni'));
     }
 
-    /**
-     * Verifikasi token dari QR yang di-scan.
-     */
     public function verify(Request $request)
     {
         $token = $request->query('token') ?? $request->input('token');
@@ -36,13 +30,12 @@ class ScanController extends Controller
             ], 400);
         }
 
-        // Cari token yang valid
         $qrToken = KostQrToken::findValid($token);
 
         if (!$qrToken) {
             return response()->json([
                 'success' => false,
-                'message' => '❌ QR Code sudah expired atau tidak valid. Minta penghuni refresh QR.',
+                'message' => '❌ QR Code tidak dikenali.',
             ], 422);
         }
 
@@ -55,10 +48,8 @@ class ScanController extends Controller
             ], 404);
         }
 
-        // Tentukan jenis log (masuk/keluar)
         $jenis = KostLog::jenisBerikutnya($kost->id);
 
-        // Simpan log
         $log = KostLog::create([
             'kost_id'      => $kost->id,
             'nama_penyewa' => $kost->nama_penyewa,
@@ -67,8 +58,7 @@ class ScanController extends Controller
             'scanned_at'   => now(),
         ]);
 
-        // Hapus token yang sudah dipakai
-        $qrToken->delete();
+        // TIDAK hapus token — QR permanen bisa scan berulang
 
         return response()->json([
             'success'      => true,

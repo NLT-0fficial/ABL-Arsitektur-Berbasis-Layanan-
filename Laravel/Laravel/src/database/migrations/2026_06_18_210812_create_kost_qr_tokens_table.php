@@ -10,13 +10,11 @@ return new class extends Migration
     {
         Schema::create('kost_qr_tokens', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('kost_id')->constrained('kosts')->onDelete('cascade');
-            $table->string('token', 64)->unique();
-            $table->timestamp('expires_at');
+            $table->foreignId('kost_id')->constrained('kosts')->cascadeOnDelete();
+            $table->string('token')->unique();
+            $table->timestamp('expires_at')->nullable();   // <-- TAMBAHKAN
+            $table->timestamp('used_at')->nullable();      // <-- TAMBAHKAN
             $table->timestamps();
-
-            $table->index('token');
-            $table->index('expires_at');
         });
     }
 

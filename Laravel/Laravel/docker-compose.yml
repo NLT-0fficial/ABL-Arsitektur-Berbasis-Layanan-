@@ -9,11 +9,11 @@ services:
     build: ./php
     image: ekos_php:latest
     container_name: ekos
-    hostname: "ekos"
+    hostname: ekos
+    working_dir: /var/www/html
     volumes:
       - ./src:/var/www/html
       - ./php/www.conf:/usr/local/etc/php-fpm.d/www.conf
-    working_dir: /var/www/html
     depends_on:
       - db_ekos
     networks:
@@ -30,7 +30,7 @@ services:
       - ./db/data:/var/lib/mysql
       - ./db/conf.d:/etc/mysql/conf.d:ro
     environment:
-      MYSQL_DATABASE: ekos        # ← tambah ini
+      MYSQL_DATABASE: ekos
       MYSQL_USER: djambred
       MYSQL_PASSWORD: p455w0rd1!.
       MYSQL_ROOT_PASSWORD: p455w0rd
@@ -44,9 +44,10 @@ services:
     build: ./nginx
     image: nginx_ekos:latest
     container_name: nginx_ekos
-    hostname: "nginx_ekos"
+    hostname: nginx_ekos
+    restart: unless-stopped
     ports:
-      - "0.0.0.0:80:80"    # ← 0.0.0.0 supaya HP bisa akses!
+      - "8080:80"
     volumes:
       - ./src:/var/www/html
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf

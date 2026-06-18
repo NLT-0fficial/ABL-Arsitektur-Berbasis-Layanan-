@@ -9,12 +9,11 @@ use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
-use Illuminate\Http\Request;
 
 class QrCodeController extends Controller
 {
     /**
-     * Tampilkan halaman QR Code untuk HP penghuni.
+     * Halaman QR Code untuk penyewa (tampilkan QR permanen).
      */
     public function show(int $id)
     {
@@ -24,11 +23,14 @@ class QrCodeController extends Controller
             abort(403, 'Kamar ini belum ada penyewa.');
         }
 
-        return view('qr.show', compact('kost'));
+        // Ambil atau buat token permanen
+        $qrToken = KostQrToken::getOrCreateFor($kost->id);
+
+        return view('qr.show', compact('kost', 'qrToken'));
     }
 
     /**
-     * Generate QR Code image (dipanggil via AJAX tiap 30 detik).
+     * Generate image QR Code (dipanggil sekali saat halaman load).
      */
     public function generate(int $id)
     {
@@ -38,13 +40,10 @@ class QrCodeController extends Controller
             return response()->json(['error' => 'Kamar kosong'], 403);
         }
 
-        // Generate token baru
-        $qrToken = KostQrToken::generateFor($kost->id);
+        $qrToken = KostQrToken::getOrCreateFor($kost->id);
 
-        // Buat URL yang akan di-encode ke QR
         $scanUrl = route('scan.verify') . '?token=' . $qrToken->token;
 
-        // Generate QR Code
         $qrCode = new QrCode(
             data: $scanUrl,
             encoding: new Encoding('UTF-8'),
@@ -55,21 +54,23 @@ class QrCodeController extends Controller
             backgroundColor: new Color(255, 255, 255),
         );
 
-        $writer = new PngWriter();
-        $result = $writer->write($qrCode);
+        $result = (new PngWriter())->write($qrCode);
 
         return response($result->getString(), 200)
             ->header('Content-Type', 'image/png')
-            ->header('Cache-Control', 'no-store, no-cache, must-revalidate')
-            ->header('Expires', '0');
+            ->header('Cache-Control', 'public, max-age=86400'); // cache 1 hari, QR tidak berubah
     }
 
     /**
-     * Tampilkan semua kamar yang terisi (untuk pilih kamar di HP).
+     * Daftar semua kamar terisi — halaman pilih kamar.
      */
     public function index()
     {
-        $kosts = Kost::terisi()->orderBy('lantai')->orderBy('nomor_kamar')->get();
+        $kosts = Kost::terisi()
+            ->orderBy('lantai')
+            ->orderBy('nomor_kamar')
+            ->get();
+
         return view('qr.index', compact('kosts'));
     }
 }

@@ -7,6 +7,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 final class Kost extends Model
 {
@@ -25,6 +27,7 @@ final class Kost extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'user_id',      // <-- TAMBAHAN
         'lantai',
         'nomor_kamar',
         'nama_penyewa',
@@ -51,6 +54,26 @@ final class Kost extends Model
         'nama_kamar_lengkap',
         'status_text',
     ];
+
+    // ============ RELATIONS ============
+
+    /**
+     * Get the user (penyewa) associated with this kost.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the QR token associated with this kost.
+     */
+    public function qrToken(): HasOne
+    {
+        return $this->hasOne(KostQrToken::class);
+    }
+
+    // ============ STATIC HELPERS ============
 
     /**
      * Get all penyewa names.
