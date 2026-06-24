@@ -30,10 +30,7 @@ final class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // ============ POLICIES ============
         Gate::policy(Activity::class, ActivityPolicy::class);
-
-        // ============ FILAMENT UI ============
         Page::formActionsAlignment(Alignment::Right);
         Notifications::alignment(Alignment::End);
         Notifications::verticalAlignment(VerticalAlignment::End);
@@ -43,12 +40,5 @@ final class AppServiceProvider extends ServiceProvider
                 ->danger()
                 ->send();
         };
-
-        // ============================================================
-        // REDIRECT PENYEWA SETELAH LOGIN
-        // ============================================================
-        // DIPINDAHKAN KE ROUTE DAN MIDDLEWARE (bukan di sini)
-        // Lihat routes/web.php dan app/Http/Middleware/RedirectIfPenyewa.php
-        // ============================================================
     }
 }
