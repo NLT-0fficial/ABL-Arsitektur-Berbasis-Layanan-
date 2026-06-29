@@ -12,6 +12,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -38,6 +39,50 @@ class RoomResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    /**
+     * Harga sewa per kategori.
+     */
+    protected const CATEGORY_PRICES = [
+        'A' => 700000,
+        'B' => 800000,
+        'C' => 900000,
+    ];
+
+    /**
+     * Lantai per kategori.
+     */
+    protected const CATEGORY_FLOORS = [
+        'A' => 1,
+        'B' => 2,
+        'C' => 3,
+    ];
+
+    /**
+     * Generate kode kamar baru berikutnya untuk kategori tertentu.
+     * Hanya dipanggil jika tidak ada kamar kosong di kategori tersebut.
+     */
+    protected static function generateNextRoomCode(string $category): string
+    {
+        $existingCodes = Room::where('category', $category)
+            ->pluck('code')
+            ->map(function ($code) use ($category) {
+                if (preg_match('/^' . $category . '-(\d+)$/', $code, $matches)) {
+                    return (int) $matches[1];
+                }
+                return null;
+            })
+            ->filter()
+            ->sort()
+            ->values();
+
+        $number = 101;
+        while ($existingCodes->contains($number)) {
+            $number++;
+        }
+
+        return "{$category}-{$number}";
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -45,13 +90,6 @@ class RoomResource extends Resource
                 Section::make('Informasi Kamar')
                     ->columns(2)
                     ->components([
-                        TextInput::make('code')
-                            ->label('Kode Kamar')
-                            ->required()
-                            ->unique(ignoreRecord: true)
-                            ->maxLength(10)
-                            ->placeholder('Contoh: A-101'),
-
                         Select::make('category')
                             ->label('Kategori')
                             ->options([
@@ -60,18 +98,59 @@ class RoomResource extends Resource
                                 'C' => 'Kategori C',
                             ])
                             ->required()
-                            ->native(false),
+                            ->native(false)
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                if (!$state) return;
+
+                                // 1. Auto-fill harga berdasarkan kategori
+                                $set('rent_price', static::CATEGORY_PRICES[$state] ?? 0);
+
+                                // 2. Auto-fill lantai berdasarkan kategori
+                                $set('floor', static::CATEGORY_FLOORS[$state] ?? null);
+
+                                // 3. Cek kamar kosong di kategori ini
+                                $vacantRoom = Room::where('category', $state)
+                                    ->where('is_occupied', false)
+                                    ->orderBy('code')
+                                    ->first();
+
+                                if ($vacantRoom) {
+                                    // Ada kamar kosong → redirect ke Edit kamar tersebut
+                                    Notification::make()
+                                        ->warning()
+                                        ->title('Kamar Kosong Ditemukan')
+                                        ->body("Kamar {$vacantRoom->code} masih kosong. Mengalihkan ke halaman edit...")
+                                        ->send();
+
+                                    redirect(RoomResource::getUrl('edit', ['record' => $vacantRoom]));
+                                    return;
+                                }
+
+                                // 4. Tidak ada kamar kosong → generate nomor baru
+                                $set('code', static::generateNextRoomCode($state));
+                            }),
+
+                        TextInput::make('code')
+                            ->label('Kode Kamar')
+                            ->required()
+                            ->unique(ignoreRecord: true)
+                            ->maxLength(10)
+                            ->placeholder('Pilih kategori dulu...')
+                            ->helperText('Terisi otomatis saat kategori dipilih, bisa diubah manual.'),
 
                         TextInput::make('floor')
                             ->label('Lantai')
                             ->numeric()
-                            ->minValue(1),
+                            ->minValue(1)
+                            ->helperText('Terisi otomatis berdasarkan kategori, bisa diubah manual.'),
 
                         TextInput::make('rent_price')
                             ->label('Harga Sewa / Bulan')
                             ->numeric()
                             ->prefix('Rp')
-                            ->required(),
+                            ->required()
+                            ->helperText('Terisi otomatis berdasarkan kategori, bisa diubah manual.'),
                     ]),
 
                 Section::make('Status & Penghuni')

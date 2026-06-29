@@ -126,7 +126,7 @@ final class AdminPanelProvider extends PanelProvider
                 FilamentDeveloperLoginsPlugin::make()
                     ->enabled(app()->environment('local'))
                     ->switchable(true)
-                    ->users(fn () => User::pluck('email', 'name')->toArray()),
+                    ->users(fn () => User::role('super_admin')->pluck('email', 'name')->toArray()),
             ])
             ->middleware([
                 EncryptCookies::class,
