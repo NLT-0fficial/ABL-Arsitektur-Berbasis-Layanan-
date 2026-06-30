@@ -43,9 +43,11 @@ class RoomSeeder extends Seeder
 
                 // Auto-buat akun User untuk setiap penyewa
                 if ($isOccupied && $created->tenant_name) {
-                    User::factory()
+                    $tenantUser = User::factory()
                         ->tenant($created->tenant_name, $created->id)
                         ->create();
+
+                    $tenantUser->assignRole('tenant');
                 }
             }
         }

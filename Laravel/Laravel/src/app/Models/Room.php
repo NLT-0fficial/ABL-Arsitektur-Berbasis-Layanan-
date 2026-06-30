@@ -81,4 +81,8 @@ class Room extends Model
     {
         return $query->where('category', $category);
     }
+    public function checkInLogs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(CheckInLog::class);
+    }
 }

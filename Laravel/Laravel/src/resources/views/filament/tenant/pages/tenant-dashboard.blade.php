@@ -26,8 +26,19 @@
                 </div>
 
                 <div class="rounded-xl bg-white dark:bg-gray-800 shadow p-6 flex items-center gap-4">
-                    <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
-                        <x-heroicon-o-tag class="w-6 h-6 text-blue-600 dark:text-blue-300"/>
+                    @php
+                        // Icon & warna berbeda untuk tiap kategori kamar
+                        $categoryStyles = [
+                            'A' => ['icon' => 'heroicon-o-star', 'bg' => 'bg-emerald-100 dark:bg-emerald-900', 'text' => 'text-emerald-600 dark:text-emerald-300'],
+                            'B' => ['icon' => 'heroicon-o-sparkles', 'bg' => 'bg-blue-100 dark:bg-blue-900', 'text' => 'text-blue-600 dark:text-blue-300'],
+                            'C' => ['icon' => 'heroicon-o-trophy', 'bg' => 'bg-purple-100 dark:bg-purple-900', 'text' => 'text-purple-600 dark:text-purple-300'],
+                        ];
+                        $style = $categoryStyles[$room->category] ?? [
+                            'icon' => 'heroicon-o-tag', 'bg' => 'bg-gray-100 dark:bg-gray-900', 'text' => 'text-gray-600 dark:text-gray-300',
+                        ];
+                    @endphp
+                    <div class="p-3 rounded-full {{ $style['bg'] }}">
+                        <x-dynamic-component :component="$style['icon']" class="w-6 h-6 {{ $style['text'] }}"/>
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Kategori</p>
@@ -83,18 +94,53 @@
 
             <div class="rounded-xl bg-white dark:bg-gray-800 shadow p-6 flex flex-col items-center justify-center gap-4">
                 <p class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">QR Code Kamar</p>
-                @if ($room->qr_image_url)
-                    <img src="{{ $room->qr_image_url }}"
-                         alt="QR Code {{ $room->code }}"
+
+                @if (! $qrImageUrl)
+                    <p class="text-gray-400 text-sm text-center">
+                        Pilih jenis aktivitas untuk membuat QR Code
+                    </p>
+
+                    <div class="flex gap-3">
+                        <button
+                            wire:click="generateQr('masuk')"
+                            type="button"
+                            class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-semibold transition"
+                        >
+                            Masuk
+                        </button>
+                        <button
+                            wire:click="generateQr('keluar')"
+                            type="button"
+                            class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold transition"
+                        >
+                            Keluar
+                        </button>
+                    </div>
+                @else
+                    <p class="text-xs font-semibold uppercase tracking-wide
+                        {{ $qrAction === 'masuk' ? 'text-green-600' : 'text-rose-600' }}">
+                        QR untuk: {{ $qrAction === 'masuk' ? 'Masuk' : 'Keluar' }}
+                    </p>
+
+                    <img src="{{ $qrImageUrl }}"
+                         alt="QR Code {{ $room->code }} - {{ $qrAction }}"
                          class="w-48 h-48 rounded-lg border border-gray-200 dark:border-gray-700"/>
-                    <p class="text-xs text-gray-400 text-center">Tunjukkan QR ini ke admin saat keluar/masuk</p>
-                    <a href="{{ $room->qr_image_url }}"
-                       download="qr-{{ $room->code }}.png"
+
+                    <p class="text-xs text-gray-400 text-center">Tunjukkan QR ini ke admin saat {{ $qrAction }}</p>
+
+                    <a href="{{ $qrImageUrl }}"
+                       download="qr-{{ $room->code }}-{{ $qrAction }}.png"
                        class="text-xs text-amber-600 hover:underline">
                         ⬇ Download QR
                     </a>
-                @else
-                    <p class="text-gray-400 text-sm">QR belum tersedia</p>
+
+                    <button
+                        wire:click="resetQr"
+                        type="button"
+                        class="text-xs text-gray-400 hover:underline mt-1"
+                    >
+                        Buat ulang / ganti aktivitas
+                    </button>
                 @endif
             </div>
 

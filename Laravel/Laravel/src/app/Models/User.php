@@ -77,4 +77,9 @@ final class User extends Authenticatable
             'password'          => 'hashed',
         ];
     }
+
+    public function checkInLogs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(CheckInLog::class, 'user_id');
+    }
 }

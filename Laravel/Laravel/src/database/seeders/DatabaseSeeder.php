@@ -12,20 +12,22 @@ final class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call([
+            RoleSeeder::class,
+        ]);
 
-        User::factory()->create([
-            'name' => 'Admin',
+        $admin = User::factory()->create([
+            'name'  => 'Admin',
             'email' => 'admin@admin.com',
         ]);
+        $admin->assignRole('super_admin');
 
         $this->call([
             RoomSeeder::class,
+            RoleSeeder::class,
+        // CheckInLogSeeder::class, // dinonaktifkan, data harus dari scan QR asli
         ]);
     }
 }

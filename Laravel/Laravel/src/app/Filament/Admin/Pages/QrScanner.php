@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Pages;
 
+use App\Models\CheckInLog;
 use App\Models\Room;
+use App\Models\User;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
@@ -32,8 +34,21 @@ class QrScanner extends Page
 
     public function processScan(string $token): void
     {
-        // Token langsung dari QR, tidak perlu parse URL
-        $room = Room::where('qr_token', trim($token))->first();
+        $token = trim($token);
+
+        $action    = null;
+        $roomToken = $token;
+
+        // payload dari TenantDashboard: "qr_token|action" (plain text, bukan base64)
+        if (str_contains($token, '|')) {
+            [$roomToken, $maybeAction] = explode('|', $token, 2);
+
+            if (in_array($maybeAction, ['masuk', 'keluar'], true)) {
+                $action = $maybeAction;
+            }
+        }
+
+        $room = Room::where('qr_token', $roomToken)->first();
 
         if (! $room) {
             $this->scanStatus  = 'error';
@@ -46,7 +61,39 @@ class QrScanner extends Page
             return;
         }
 
-        $this->scannedToken = $token;
+        // Cari akun penyewa yang terdaftar untuk kamar ini
+        $tenant = User::where('room_id', $room->id)->first();
+
+        if (! $tenant) {
+            $this->scanStatus  = 'error';
+            $this->scannedRoom = null;
+
+            Notification::make()
+                ->title('Kamar belum punya akun penyewa terdaftar')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        // Kalau action tidak ada di payload QR, tentukan otomatis (toggle dari log terakhir)
+        if ($action === null) {
+            $lastLog = CheckInLog::where('room_id', $room->id)
+                ->where('user_id', $tenant->id)
+                ->latest('scanned_at')
+                ->first();
+
+            $action = ($lastLog && $lastLog->type === 'masuk') ? 'keluar' : 'masuk';
+        }
+
+        $log = CheckInLog::create([
+            'user_id'    => $tenant->id,
+            'room_id'    => $room->id,
+            'scanned_by' => auth()->id(),
+            'type'       => $action,
+            'scanned_at' => now(),
+        ]);
+
+        $this->scannedToken = $roomToken;
         $this->scannedRoom  = [
             'code'           => $room->code,
             'category'       => $room->category,
@@ -55,12 +102,16 @@ class QrScanner extends Page
             'tenant_phone'   => $room->tenant_phone ?? '-',
             'rent_price'     => number_format($room->rent_price, 0, ',', '.'),
             'occupied_since' => $room->occupied_since?->translatedFormat('d M Y') ?? '-',
+            'action'         => $log->type, // 'masuk' | 'keluar'
         ];
         $this->scanStatus = 'success';
 
         Notification::make()
             ->title('QR Berhasil Dibaca')
-            ->body('Kamar ' . $room->code . ' — ' . ($room->tenant_name ?? 'Kosong'))
+            ->body(
+                'Kamar ' . $room->code . ' — ' . ($room->tenant_name ?? 'Kosong')
+                . ' (' . ucfirst($log->type) . ')'
+            )
             ->success()
             ->send();
     }
