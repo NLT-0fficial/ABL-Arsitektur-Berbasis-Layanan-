@@ -1,68 +1,116 @@
-### === Laravel (src/) ===
-src/vendor/
-src/node_modules/
-src/.env
-src/.env.*
-!src/.env.example
-src/.phpunit.result.cache
-src/.phpunit.cache
-src/Homestead.json
-src/Homestead.yaml
-src/auth.json
-src/npm-debug.log
-src/yarn-error.log
+###############################################################################
+# Laravel Project (ABL/Laravel/Laravel)
+###############################################################################
 
-src/public/hot
-src/public/storage
-src/public/build/
+Laravel/Laravel/vendor/
+Laravel/Laravel/node_modules/
 
-src/storage/*.key
-src/storage/app/*
-!src/storage/app/public
-!src/storage/app/.gitignore
+Laravel/Laravel/.env
+Laravel/Laravel/.env.*
+!Laravel/Laravel/.env.example
 
-src/storage/framework/cache/*
-!src/storage/framework/cache/.gitignore
+Laravel/Laravel/.phpunit.result.cache
+Laravel/Laravel/.phpunit.cache
 
-src/storage/framework/sessions/*
-!src/storage/framework/sessions/.gitignore
+Laravel/Laravel/Homestead.yaml
+Laravel/Laravel/Homestead.json
 
-src/storage/framework/testing/*
-!src/storage/framework/testing/.gitignore
+Laravel/Laravel/auth.json
 
-src/storage/framework/views/*
-!src/storage/framework/views/.gitignore
+Laravel/Laravel/npm-debug.log*
+Laravel/Laravel/yarn-debug.log*
+Laravel/Laravel/yarn-error.log*
 
-src/storage/logs/*
-!src/storage/logs/.gitignore
+###############################################################################
+# Build
+###############################################################################
 
-src/bootstrap/cache/*
-!src/bootstrap/cache/.gitignore
+Laravel/Laravel/public/build/
+Laravel/Laravel/public/hot
+Laravel/Laravel/public/storage
 
-src/database/*.sqlite
-src/database/*.sqlite-journal
+###############################################################################
+# Storage
+###############################################################################
 
-### === Docker ===
-db/data/
-db/conf.d/*.log
-nginx/logs/
-php/logs/
-*.log
+Laravel/Laravel/storage/*.key
 
-# Docker override / env khusus lokal
+Laravel/Laravel/storage/app/*
+!Laravel/Laravel/storage/app/.gitignore
+!Laravel/Laravel/storage/app/public/
+!Laravel/Laravel/storage/app/public/.gitignore
+
+Laravel/Laravel/storage/framework/cache/*
+!Laravel/Laravel/storage/framework/cache/.gitignore
+
+Laravel/Laravel/storage/framework/sessions/*
+!Laravel/Laravel/storage/framework/sessions/.gitignore
+
+Laravel/Laravel/storage/framework/testing/*
+!Laravel/Laravel/storage/framework/testing/.gitignore
+
+Laravel/Laravel/storage/framework/views/*
+!Laravel/Laravel/storage/framework/views/.gitignore
+
+Laravel/Laravel/storage/logs/*
+!Laravel/Laravel/storage/logs/.gitignore
+
+###############################################################################
+# Bootstrap Cache
+###############################################################################
+
+Laravel/Laravel/bootstrap/cache/*
+!Laravel/Laravel/bootstrap/cache/.gitignore
+
+###############################################################################
+# SQLite
+###############################################################################
+
+Laravel/Laravel/database/*.sqlite
+Laravel/Laravel/database/*.sqlite-journal
+
+###############################################################################
+# Docker
+###############################################################################
+
+Laravel/Laravel/db/data/
+Laravel/Laravel/db/data/**
+Laravel/Laravel/db/conf.d/*.log
+
+Laravel/Laravel/nginx/logs/
+Laravel/Laravel/php/logs/
+
+###############################################################################
+# Docker Compose
+###############################################################################
+
 docker-compose.override.yml
-.env
-.env.*
-!.env.example
 
-### === IDE / Editor ===
+###############################################################################
+# IDE
+###############################################################################
+
 .idea/
 .vscode/
 *.swp
 *.swo
+
+###############################################################################
+# OS
+###############################################################################
+
 .DS_Store
 Thumbs.db
 
-### === Misc ===
+###############################################################################
+# Logs
+###############################################################################
+
+*.log
+
+###############################################################################
+# Cache
+###############################################################################
+
 *.cache
 .phpactor.json
